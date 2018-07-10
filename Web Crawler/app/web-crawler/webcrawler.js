@@ -9,9 +9,7 @@ app.get('/', (req, res) => {
 	
 	
 	var nightmare = Nightmare({
-//		  show:true,  
 		  waitTimeout: 5000,
-//		  running: true,
 		  webPreferences: {
 		    webSecurity:false
 		    }
@@ -33,8 +31,6 @@ app.get('/', (req, res) => {
 				 console.error('Search failed:', error); 
 				 res.send("ERROR");
 			 });
-	
-
 	
 });
 

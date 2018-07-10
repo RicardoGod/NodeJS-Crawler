@@ -1,0 +1,15 @@
+ {
+    "name": "WebCrawler",
+    "version": "1.0",
+    "description": "Integration with NodeJS WebCrawler",
+    "permissions": ["activeTab", "declarativeContent", "storage"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": true
+      },
+      "page_action": {
+          "default_popup": "popup.html"
+      },
+     
+    "manifest_version": 2
+  }
