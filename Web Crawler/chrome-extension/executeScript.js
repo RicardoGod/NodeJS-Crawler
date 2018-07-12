@@ -14,11 +14,20 @@
 	document.onclick = function (e) { 
 		e.preventDefault();
 		e.stopPropagation();
-		console.log(getPath(e.target));
+		
 		document.onclick = null;
+		document.onmouseover = null;
+		document.onmouseout(e);
+		document.onmouseout = null;
 		enableScroll();
 		document.getElementsByTagName("body")[0].removeChild(document.querySelector("body > #webcrawler-overlaydiv"));
-		return getPath(e.target);
+		
+		var selector = getPath(e.target);
+		console.log(selector);
+		
+		makeCall( window.location.href, selector, "http://127.0.0.1", "3000" );
+		
+		return ;
 	}
 	
 	document.onmouseover = function (e) {
@@ -34,18 +43,43 @@
 })();	  
   
 	  
-
+function makeCall (pageUrl, selector, serverUrl, serverPort){
+	var xhttp = new XMLHttpRequest();
+	var postData = '{ "url" : "'+pageUrl+'" , "selector" : "'+selector+'" }';
+	
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			console.log(this.responseText);
+		}
+	};
+	if (serverPort){
+		xhttp.open("POST", serverUrl+":"+serverPort+"/add" , true);
+		
+	}
+	else{
+		xhttp.open("POST", serverUrl+"/add" , true);
+	}
+	//postData.url = pageUrl;
+	//postData.selector = selector;
+	
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.setRequestHeader("Access-Control-Allow-Origin","*");
+	xhttp.setRequestHeader("Access-Control-Allow-Headers","Access-Control-Allow-Origin,  Access-Control-Allow-Headers, Content-Type");
+	xhttp.send(postData);
+}
 
 
 
 function getPath( path ) {
 	// The first time this function is called, path won't be defined.
-	if ( typeof path == 'undefined' ) path = '';
+	if ( typeof path == 'undefined' ) 
+		path = '';
 
 	// If this element is <html> we've reached the end of the path.
-	if ( path.nodeName.toLowerCase() == 'html' )
+	if ( path.nodeName.toLowerCase() == 'html'){
 		return 'html' ;
-
+	}
+		
 	// Add the element name.
 	var cur = path.nodeName.toLowerCase();
 
