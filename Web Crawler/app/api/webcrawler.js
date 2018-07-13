@@ -2,7 +2,6 @@ var bodyParser = require('body-parser');
 var expressaa = require ('express-async-await');
 var express = require('express');
 var Nightmare = require('nightmare');
-require('nightmare-iframe-manager')(Nightmare);
 
 
 var app = expressaa(express());
@@ -33,52 +32,61 @@ app.post('/add',(req, res) => {
 	
 	var nightmare = Nightmare({
 		  waitTimeout: 5000,
-		  webPreferences: {
-		    webSecurity:false
-		    }
-		  });
-	nightmare.goto(url)
-			 //.wait(function(selectorParam){ return nightmare.exists(selectorParam)}, selector)
-			 .evaluate(selectorParam => {
-				 return document.querySelector(selectorParam).textContent;
+		  executionTimeout : 5000,
+		  poolInterval : 50
+	});
+	
+	nightmare.on('console', (log, msg) => {
+			     console.log(msg)
+			 })
+			 .goto(url)
+			 .wait(function(selector){
+				 return document.querySelector(selector).textContent.trim() != '';
+			 }, selector)
+			 .evaluate(function(selector){
+				 return document.querySelector(selector).textContent;
 			 }, selector)
 			 .end()
 			 .then(function (result) {
+				 console.log("Value is: "+result);
 				 res.send("Value is: "+result);
+				 return result;
 			 })
 			 .catch(function (error) {
 				 console.error('Search failed:', error); 
-				
 				 res.send("ERROR");
 			 });
+	
 	
 });
 
 app.get('/', function (req, res) {
 	
-	
-	var nightmare = Nightmare({
-		  waitTimeout: 5000,
-		  webPreferences: {
-		    webSecurity:false
-		    }
-		  });
-	nightmare.goto('https://tools.euroland.com/tools/ticker/html/?companycode=pt-ctt&lang=pt-PT')
-			 .wait('html > body.pt-PT > div > div.instrument.instrument_93868 > div.Container > div.PriceCont > div.Last > span.last')
-			 .evaluate(function() {
-				 return document.querySelector('html > body.pt-PT > div > div.instrument.instrument_93868 > div.Container > div.PriceCont > div.Last > span.last').innerText;
-			 })
-			 .end()
-			 .then(function (result) {
-				 
-				 console.log('O valor das acções CTT atual é: ' + result +'€\n'); 
-				 res.send("O valor das acções CTT atual é: "+result+ "€");
-			 })
-			 .catch(function (error) {
-				 console.error('Search failed:', error); 
-				 res.send("ERROR");
-			 });
-	
+	var Nightmare = require('nightmare');
+	var n = Nightmare();
+	var value;
+
+	Promise.resolve()
+	.then(function () { 
+	  return n.goto('https://tools.euroland.com/tools/ticker/html/?companycode=pt-ctt&lang=pt-PT')
+	    .wait(function(){ return document.querySelector('body > div > div > div > div.PriceCont > div.Last > span').textContent.trim() != '' })
+	    .evaluate(function () {
+	      var element = document.querySelector('body > div > div > div > div.PriceCont > div.Last > span');
+	      return {
+	          value: element.textContent
+	      }
+	    });
+	})
+	.then(function (_value) {
+	  value = _value;
+	  n.end();
+	})  
+	.then(function () {
+	  console.log(value);    // <-- prints out "undefined" (expected to see a DOM element)
+	});
+    
+    
+    
 });
 
 

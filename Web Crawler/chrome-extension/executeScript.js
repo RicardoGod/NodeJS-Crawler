@@ -59,9 +59,6 @@ function makeCall (pageUrl, selector, serverUrl, serverPort){
 	else{
 		xhttp.open("POST", serverUrl+"/add" , true);
 	}
-	//postData.url = pageUrl;
-	//postData.selector = selector;
-	
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.setRequestHeader("Access-Control-Allow-Origin","*");
 	xhttp.setRequestHeader("Access-Control-Allow-Headers","Access-Control-Allow-Origin,  Access-Control-Allow-Headers, Content-Type");
@@ -89,12 +86,12 @@ function getPath( path ) {
 
 
 	// Add the #id if there is one.
-	if ( typeof id != 'undefined' ){
+	if ( typeof id != 'undefined' && path.nodeName.toLowerCase() != 'html' && path.nodeName.toLowerCase() != 'body'){
 		id = id.value;
 		cur += '#' + id;
 	}
 	// Add any classes.
-	if ( typeof classe != 'undefined' ){
+	if ( typeof classe != 'undefined' && path.nodeName.toLowerCase() != 'html' && path.nodeName.toLowerCase() != 'body' ){
 		classe = classe.value;
 		var classes = classe.split(/[\s\n]+/);
 		//cur += '.' + classe.split(/[\s\n]+/).join('.');
