@@ -11,6 +11,12 @@
 		iframes[i].style.pointerEvents = "none";
 	}
 	
+	
+	
+	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+	});
+	
+	
 	document.onclick = function (e) { 
 		e.preventDefault();
 		e.stopPropagation();
@@ -23,7 +29,6 @@
 		document.getElementsByTagName("body")[0].removeChild(document.querySelector("body > #webcrawler-overlaydiv"));
 		
 		var selector = getPath(e.target);
-		console.log(selector);
 		
 		makeCall( window.location.href, selector, "http://127.0.0.1", "3000" );
 		
@@ -45,7 +50,7 @@
 	  
 function makeCall (pageUrl, selector, serverUrl, serverPort){
 	var xhttp = new XMLHttpRequest();
-	var postData = '{ "url" : "'+pageUrl+'" , "selector" : "'+selector+'" }';
+	var postData = '{ "url" : "'+pageUrl+'" , "selector" : "'+selector+'", "clientId" : "'+config.id+'" }';
 	
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {

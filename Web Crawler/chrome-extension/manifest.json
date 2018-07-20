@@ -1,15 +1,19 @@
  {
+	"key" : "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqAVvCgC++xKChOQRVyz1Ii0p0QdRSKYCS27vKcdWQdHQdAfuIbO+9SzzaxDjD2Mvu7bvd9hbMhe6S7RItDURdiNGwoeIwpNJ+OGQQDUU6HF7TfHwX0rwiPkDJM7AhDUI0w3o0tnvb44tIt1XxXN5cUiCmFhoTdXmYeKPLhXAPyRaOFLm+OIVwlKWaVBcfQY8hj6evL/LT92yBHuItx98Lxfc2eNQBXFk4HWXRqyNh1alLzmarfYS1cISNwb6ra3ZwmyRY5VzbKWOuj12CTvwO3X7J0GNgpBRwGrBfra/vhjCaVi0igeHm/0Jptn1VOD8gT1uuShgjk3Xo7GEOjPnbwIDAQAB",
     "name": "WebCrawler",
     "version": "1.0",
     "description": "Integration with NodeJS WebCrawler",
-    "permissions": ["activeTab", "declarativeContent", "storage"],
+    "permissions": ["activeTab", "declarativeContent", "storage", "identity"],
     "background": {
-        "scripts": ["background.js"],
+    	"scripts": ["background.js"],
         "persistent": true
-      },
-      "page_action": {
-          "default_popup": "popup.html"
-      },
-     
+    },
+    "page_action": {
+        "default_popup": "popup.html"
+    },
+    "oauth2": {
+        "client_id": "158629456607-gvvssv7ddule2051tuas36iqgtq5ibor.apps.googleusercontent.com",
+        "scopes":["profile", "https://www.googleapis.com/auth/userinfo.profile"]
+    },
     "manifest_version": 2
   }
