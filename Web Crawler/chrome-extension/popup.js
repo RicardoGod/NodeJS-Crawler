@@ -13,8 +13,7 @@ addSelectorButton.onclick = function(element) {
 		    x.onload = function() {
 		    	
 		        var response = JSON.parse(x.response);
-		    	
-		        var config = {"id": response.id};
+		        var idValue = response.id;
 		        
 				chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 	  				chrome.tabs.executeScript(
@@ -22,7 +21,7 @@ addSelectorButton.onclick = function(element) {
 							{file: 'executeScript.js'}
 						
 					,function(){
-						 chrome.tabs.sendMessage( tabs[0].id,{code: 'var config = '+JSON.stringify(config)+';'});
+						 chrome.tabs.sendMessage( tabs[0].id,{ id : idValue});
 					});
 				});
 		  

@@ -11,9 +11,10 @@
 		iframes[i].style.pointerEvents = "none";
 	}
 	
-	
+	var clientId;
 	
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+		clientId = message.id;
 	});
 	
 	
@@ -45,105 +46,107 @@
 		e.target.style.outline = "none";
 	}
 
-})();	  
   
 	  
-function makeCall (pageUrl, selector, serverUrl, serverPort){
-	var xhttp = new XMLHttpRequest();
-	var postData = '{ "url" : "'+pageUrl+'" , "selector" : "'+selector+'", "clientId" : "'+config.id+'" }';
-	
-	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			console.log(this.responseText);
-		}
-	};
-	if (serverPort){
-		xhttp.open("POST", serverUrl+":"+serverPort+"/add" , true);
+	function makeCall (pageUrl, selector, serverUrl, serverPort){
+		var xhttp = new XMLHttpRequest();
+		var postData = '{ "url" : "'+pageUrl+'" , "selector" : "'+selector+'", "clientId" : "'+clientId+'" }';
 		
-	}
-	else{
-		xhttp.open("POST", serverUrl+"/add" , true);
-	}
-	xhttp.setRequestHeader("Content-Type", "application/json");
-	xhttp.setRequestHeader("Access-Control-Allow-Origin","*");
-	xhttp.setRequestHeader("Access-Control-Allow-Headers","Access-Control-Allow-Origin,  Access-Control-Allow-Headers, Content-Type");
-	xhttp.send(postData);
-}
-
-
-
-function getPath( path ) {
-	// The first time this function is called, path won't be defined.
-	if ( typeof path == 'undefined' ) 
-		path = '';
-
-	// If this element is <html> we've reached the end of the path.
-	if ( path.nodeName.toLowerCase() == 'html'){
-		return 'html' ;
-	}
-		
-	// Add the element name.
-	var cur = path.nodeName.toLowerCase();
-
-	// Determine the IDs and path.
-	var id    = path.attributes['id'],
-		classe = path.attributes['class'];
-
-
-	// Add the #id if there is one.
-	if ( typeof id != 'undefined' && path.nodeName.toLowerCase() != 'html' && path.nodeName.toLowerCase() != 'body'){
-		id = id.value;
-		cur += '#' + id;
-	}
-	// Add any classes.
-	if ( typeof classe != 'undefined' && path.nodeName.toLowerCase() != 'html' && path.nodeName.toLowerCase() != 'body' ){
-		classe = classe.value;
-		var classes = classe.split(/[\s\n]+/);
-		//cur += '.' + classe.split(/[\s\n]+/).join('.');
-		for(var index in classes){
-			if(!classes[index].trim() == '')
-				cur += '.'+classes[index];
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				console.log(this.responseText);
+			}
+		};
+		if (serverPort){
+			xhttp.open("POST", serverUrl+":"+serverPort+"/add" , true);
+			
 		}
+		else{
+			xhttp.open("POST", serverUrl+"/add" , true);
+		}
+		xhttp.setRequestHeader("Content-Type", "application/json");
+		xhttp.setRequestHeader("Access-Control-Allow-Origin","*");
+		xhttp.setRequestHeader("Access-Control-Allow-Headers","Access-Control-Allow-Origin,  Access-Control-Allow-Headers, Content-Type");
+		xhttp.send(postData);
 	}
 	
-	// Recurse up the DOM.
-	return getPath(path.parentNode) + ' > ' + cur;
-}
+	
+	
+	function getPath( path ) {
+		// The first time this function is called, path won't be defined.
+		if ( typeof path == 'undefined' ) 
+			path = '';
+	
+		// If this element is <html> we've reached the end of the path.
+		if ( path.nodeName.toLowerCase() == 'html'){
+			return 'html' ;
+		}
+			
+		// Add the element name.
+		var cur = path.nodeName.toLowerCase();
+	
+		// Determine the IDs and path.
+		var id    = path.attributes['id'],
+			classe = path.attributes['class'];
+	
+	
+		// Add the #id if there is one.
+		if ( typeof id != 'undefined' && path.nodeName.toLowerCase() != 'html' && path.nodeName.toLowerCase() != 'body'){
+			id = id.value;
+			cur += '#' + id;
+		}
+		// Add any classes.
+		if ( typeof classe != 'undefined' && path.nodeName.toLowerCase() != 'html' && path.nodeName.toLowerCase() != 'body' ){
+			classe = classe.value;
+			var classes = classe.split(/[\s\n]+/);
+			//cur += '.' + classe.split(/[\s\n]+/).join('.');
+			for(var index in classes){
+				if(!classes[index].trim() == '')
+					cur += '.'+classes[index];
+			}
+		}
+		
+		// Recurse up the DOM.
+		return getPath(path.parentNode) + ' > ' + cur;
+	}
+	
+	/* DISABLE SCROLL */
+	
+	//left: 37, up: 38, right: 39, down: 40,
+	//spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+	var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+	
+	function preventDefault(e) {
+	e = e || window.event;
+	if (e.preventDefault)
+	   e.preventDefault();
+	e.returnValue = false;  
+	}
+	
+	function preventDefaultForScrollKeys(e) {
+	 if (keys[e.keyCode]) {
+	     preventDefault(e);
+	     return false;
+	 }
+	}
+	
+	function disableScroll() {
+	if (window.addEventListener) // older FF
+	   window.addEventListener('DOMMouseScroll', preventDefault, false);
+	window.onwheel = preventDefault; // modern standard
+	window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+	window.ontouchmove  = preventDefault; // mobile
+	document.onkeydown  = preventDefaultForScrollKeys;
+	}
+	
+	function enableScroll() {
+	 if (window.removeEventListener)
+	     window.removeEventListener('DOMMouseScroll', preventDefault, false);
+	 window.onmousewheel = document.onmousewheel = null; 
+	 window.onwheel = null; 
+	 window.ontouchmove = null;  
+	 document.onkeydown = null;  
+	}
 
-/* DISABLE SCROLL */
 
-//left: 37, up: 38, right: 39, down: 40,
-//spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-var keys = {37: 1, 38: 1, 39: 1, 40: 1};
-
-function preventDefault(e) {
-e = e || window.event;
-if (e.preventDefault)
-   e.preventDefault();
-e.returnValue = false;  
-}
-
-function preventDefaultForScrollKeys(e) {
- if (keys[e.keyCode]) {
-     preventDefault(e);
-     return false;
- }
-}
-
-function disableScroll() {
-if (window.addEventListener) // older FF
-   window.addEventListener('DOMMouseScroll', preventDefault, false);
-window.onwheel = preventDefault; // modern standard
-window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
-window.ontouchmove  = preventDefault; // mobile
-document.onkeydown  = preventDefaultForScrollKeys;
-}
-
-function enableScroll() {
- if (window.removeEventListener)
-     window.removeEventListener('DOMMouseScroll', preventDefault, false);
- window.onmousewheel = document.onmousewheel = null; 
- window.onwheel = null; 
- window.ontouchmove = null;  
- document.onkeydown = null;  
-}
+})();	  
