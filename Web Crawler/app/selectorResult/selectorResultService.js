@@ -1,3 +1,3 @@
-//MANAGER
+
 
 module.exports = app => {}

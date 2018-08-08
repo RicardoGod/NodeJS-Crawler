@@ -1,3 +1,2 @@
-//DAO
 
 module.exports = app => {}
